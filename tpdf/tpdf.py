@@ -86,17 +86,18 @@ class Tpdf(ChrisApp):
     An app to ...
     """
     PACKAGE                 = __package__
-    TITLE                   = 'Pdf generation for tcovidnet'
+    TITLE                   = 'PDF generation plugin'
     CATEGORY                = ''
     TYPE                    = 'ds'
-    ICON                    = ''   # url of an icon image
-    MIN_NUMBER_OF_WORKERS   = 1    # Override with the minimum number of workers as int
-    MAX_NUMBER_OF_WORKERS   = 1    # Override with the maximum number of workers as int
-    MIN_CPU_LIMIT           = 1000 # Override with millicore value as int (1000 millicores == 1 CPU core)
-    MIN_MEMORY_LIMIT        = 200  # Override with memory MegaByte (MB) limit as int
-    MIN_GPU_LIMIT           = 0    # Override with the minimum number of GPUs as int
-    MAX_GPU_LIMIT           = 0    # Override with the maximum number of GPUs as int
-
+    ICON                    = '' # url of an icon image
+    MAX_NUMBER_OF_WORKERS   = 1  # Override with integer value
+    MIN_NUMBER_OF_WORKERS   = 1  # Override with integer value
+    MAX_CPU_LIMIT           = '' # Override with millicore value as string, e.g. '2000m'
+    MIN_CPU_LIMIT           = '' # Override with millicore value as string, e.g. '2000m'
+    MAX_MEMORY_LIMIT        = '' # Override with string, e.g. '1Gi', '2000Mi'
+    MIN_MEMORY_LIMIT        = '' # Override with string, e.g. '1Gi', '2000Mi'
+    MIN_GPU_LIMIT           = 0  # Override with the minimum number of GPUs, as an integer, for your plugin
+    MAX_GPU_LIMIT           = 0  # Override with the maximum number of GPUs, as an integer, for your plugin
     # Use this dictionary structure to provide key-value output descriptive information
     # that may be useful for the next downstream plugin. For example:
     #
@@ -115,14 +116,62 @@ class Tpdf(ChrisApp):
         Define the CLI arguments accepted by this plugin app.
         Use self.add_argument to specify a new app argument.
         """
-
+        self.add_argument('--imagefile', 
+            dest         = 'imagefile', 
+            type         = str, 
+            optional     = False,
+            help         = 'Name of image file submitted to the analysis')
+        self.add_argument('--patientId', 
+            dest         = 'patientId', 
+            type         = str, 
+            optional     = True,
+            default      = 'not specified',
+            help         = 'Patient ID')
     def run(self, options):
         """
         Define the code to be run by this plugin app.
         """
         print(Gstr_title)
         print('Version: %s' % self.get_version())
+        # fetch input data
+        with open('{}/prediction-default.json'.format(options.inputdir)) as f:
+          classification_data = json.load(f)
+        try: 
+            with open('{}/severity.json'.format(options.inputdir)) as f:
+                severityScores = json.load(f)
+        except:
+            severityScores = None
 
+        template_file = "pdf-covid-positive-template.html" 
+        if classification_data['prediction'] != "COVID-19" or severityScores is None:
+            template_file = "pdf-covid-negative-template.html"
+
+        txt = files('pdfgeneration').joinpath('template').joinpath(template_file).read_text()
+        # replace the values
+        txt = txt.replace("${PATIENT_TOKEN}", options.patientId)
+        txt = txt.replace("${PREDICTION_CLASSIFICATION}", classification_data['prediction'])
+        txt = txt.replace("${COVID-19}", classification_data['COVID-19'])
+        txt = txt.replace("${NORMAL}", classification_data['Normal'])
+        txt = txt.replace("${PNEUMONIA}", classification_data['Pneumonia'])
+        txt = txt.replace("${X-RAY-IMAGE}", options.imagefile)
+
+        time = datetime.datetime.now()
+        txt = txt.replace("${month-date}", time.strftime("%c"))
+        txt = txt.replace("${year}", time.strftime("%Y"))
+        # add the severity value if prediction is covid
+        if template_file == "pdf-covid-positive-template.html":
+            txt = txt.replace("${GEO_SEVERITY}", severityScores["Geographic severity"])
+            txt = txt.replace("${GEO_EXTENT_SCORE}", severityScores["Geographic extent score"])
+            txt = txt.replace("${OPC_SEVERITY}", severityScores["Opacity severity"])
+            txt = txt.replace("${OPC_EXTENT_SCORE}", severityScores['Opacity extent score'])
+
+        # pdfkit wkhtmltopdf is hard-coded to look in /tmp for assets
+        # when input is a string
+        for asset_file in files('pdfgeneration').joinpath('template/assets').iterdir():
+            os.symlink(asset_file, path.join('/tmp', asset_file.name))
+        os.symlink(path.join(options.inputdir, options.imagefile), path.join('/tmp', options.imagefile))
+
+        pdfkit.from_string(txt, path.join(options.outputdir, 'patient_analysis.pdf'))
     def show_man_page(self):
         """
         Print the app's man page.
