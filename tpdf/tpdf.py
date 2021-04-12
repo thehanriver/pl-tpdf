@@ -116,6 +116,12 @@ class Tpdf(ChrisApp):
         Define the CLI arguments accepted by this plugin app.
         Use self.add_argument to specify a new app argument.
         """
+        self.add_argument('--dir',
+        	dest = 'dir',
+        	type = 'str',
+        	optional = True,
+        	default = 'not specified',
+        	help = 'directory')
         self.add_argument('--imagefile', 
             dest         = 'imagefile', 
             type         = str, 
@@ -127,12 +133,6 @@ class Tpdf(ChrisApp):
             optional     = True,
             default      = 'not specified',
             help         = 'Patient ID')
-	self.add_argument('--dir',
-		dest 	= 'dir',
-		type	= str,
-		optional	= True,
-		default	= 'not specified',
-		help	= 'directory')
 		
     def run(self, options):
         """
