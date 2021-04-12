@@ -127,17 +127,30 @@ class Tpdf(ChrisApp):
             optional     = True,
             default      = 'not specified',
             help         = 'Patient ID')
+	self.add_argument('--dir',
+		dest 	= 'dir',
+		type	= str,
+		optional	= True,
+		default	= 'not specified',
+		help	= 'directory')
+		
     def run(self, options):
         """
         Define the code to be run by this plugin app.
         """
         print(Gstr_title)
         print('Version: %s' % self.get_version())
+        
+        self.args.modelused = 'default'
+        directory = self.args.dir
+        parent_dir = self.args.inputputdir
+        nPath = os.path.join(parent_dir , directory)
+        
         # fetch input data
-        with open('{}/prediction-default.json'.format(options.inputdir)) as f:
+        with open('{}/prediction-default.json'.format(nPath)) as f:
           classification_data = json.load(f)
         try: 
-            with open('{}/severity.json'.format(options.inputdir)) as f:
+            with open('{}/severity.json'.format(nPath)) as f:
                 severityScores = json.load(f)
         except:
             severityScores = None
