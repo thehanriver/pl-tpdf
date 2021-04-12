@@ -118,7 +118,7 @@ class Tpdf(ChrisApp):
         """
         self.add_argument('--dir',
         	dest = 'dir',
-        	type = 'str',
+        	type = str,
         	optional = True,
         	default = 'not specified',
         	help = 'directory')
