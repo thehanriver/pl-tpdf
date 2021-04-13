@@ -142,8 +142,8 @@ class Tpdf(ChrisApp):
         print('Version: %s' % self.get_version())
         
         self.args.modelused = 'default'
-        directory = self.args.dir
-        parent_dir = self.args.inputputdir
+        directory = options.dir
+        parent_dir = options.inputputdir
         nPath = os.path.join(parent_dir , directory)
         
         # fetch input data
@@ -182,7 +182,7 @@ class Tpdf(ChrisApp):
         # when input is a string
         for asset_file in files('pdfgeneration').joinpath('template/assets').iterdir():
             os.symlink(asset_file, path.join('/tmp', asset_file.name))
-        os.symlink(path.join(options.inputdir, options.imagefile), path.join('/tmp', options.imagefile))
+        os.symlink(path.join(nPath, options.imagefile), path.join('/tmp', options.imagefile))
 
         pdfkit.from_string(txt, path.join(options.outputdir, 'patient_analysis.pdf'))
     def show_man_page(self):
