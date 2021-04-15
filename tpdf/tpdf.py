@@ -143,7 +143,7 @@ class Tpdf(ChrisApp):
         
         
         directory = options.dir
-        parent_dir = options.inputputdir
+        parent_dir = options.inputdir
         nPath = os.path.join(parent_dir , directory)
         
         # fetch input data
