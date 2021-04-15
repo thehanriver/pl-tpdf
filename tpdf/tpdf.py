@@ -141,7 +141,7 @@ class Tpdf(ChrisApp):
         print(Gstr_title)
         print('Version: %s' % self.get_version())
         
-        self.args.modelused = 'default'
+        
         directory = options.dir
         parent_dir = options.inputputdir
         nPath = os.path.join(parent_dir , directory)
