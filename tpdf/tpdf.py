@@ -165,7 +165,7 @@ class Tpdf(ChrisApp):
         if classification_data['prediction'] != "COVID-19" or severityScores is None:
             template_file = "pdf-covid-negative-template.html"
 
-        txt = files('pdfgeneration').joinpath('template').joinpath(template_file).read_text()
+        txt = files('tpdf').joinpath('template').joinpath(template_file).read_text()
         # replace the values
         txt = txt.replace("${PATIENT_TOKEN}", options.patientId)
         txt = txt.replace("${PREDICTION_CLASSIFICATION}", classification_data['prediction'])
@@ -186,7 +186,7 @@ class Tpdf(ChrisApp):
 
         # pdfkit wkhtmltopdf is hard-coded to look in /tmp for assets
         # when input is a string
-        for asset_file in files('pdfgeneration').joinpath('template/assets').iterdir():
+        for asset_file in files('tpdf').joinpath('template/assets').iterdir():
             os.symlink(asset_file, path.join('/tmp', asset_file.name))
         os.symlink(path.join(nPath, options.imagefile), path.join('/tmp', options.imagefile))
 
