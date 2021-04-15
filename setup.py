@@ -19,6 +19,9 @@ setup(
     license          = 'MIT',
     zip_safe         = False,
     python_requires  = '>=3.6',
+    package_data     = {
+        'pdfgeneration': ['template/*', 'template/assets/*']
+    },
     entry_points     = {
         'console_scripts': [
             'tpdf = tpdf.__main__:main'
