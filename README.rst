@@ -17,13 +17,13 @@ pl-tpdf
 Abstract
 --------
 
-An app to ...
+An app to generate PDFs based in the topological covidnet workflow
 
 
 Description
 -----------
 
-``tpdf`` is a ChRIS-based application that...
+``tpdf`` is a ChRIS-based application that takes in subdirectories from TS plugin and generates PDFs
 
 
 Usage
@@ -37,6 +37,7 @@ Usage
         [--savejson <DIR>]
         [-v|--verbosity <level>]
         [--version]
+        [--dir]
         <inputDir> <outputDir>
 
 
@@ -64,8 +65,10 @@ Arguments
     Verbosity level for app. Not used currently.
     
     [--version]
-    If specified, print version number and exit. 
-
+    If specified, print version number and exit.
+    
+    [--dir]
+    Name of sub directory in the previous plugin
 
 Getting inline help is:
 
@@ -83,7 +86,7 @@ You need to specify input and output directories using the `-v` flag to `docker 
 
     docker run --rm -u $(id -u)                             \
         -v $(pwd)/in:/incoming -v $(pwd)/out:/outgoing      \
-        fnndsc/pl-tpdf tpdf                        \
+        fnndsc/pl-tpdf tpdf --dir "41"                      \
         /incoming /outgoing
 
 
