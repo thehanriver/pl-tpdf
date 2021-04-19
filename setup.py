@@ -7,7 +7,7 @@ with open(path.join(path.dirname(path.abspath(__file__)), 'README.rst')) as f:
 setup(
     name             = 'tpdf',
     version          = '0.0.1',
-    description      = 'An app to ...',
+    description      = 'An app to generate PDS for subdirectories',
     long_description = readme,
     author           = 'mario',
     author_email     = 'hanmario@bu.edu',
