@@ -74,7 +74,7 @@ Getting inline help is:
 
 .. code:: bash
 
-    docker run --rm fnndsc/pl-tpdf tpdf --man
+    docker run --rm jonocameron/pl-tpdf tpdf --man
 
 Run
 ~~~
@@ -86,9 +86,35 @@ You need to specify input and output directories using the `-v` flag to `docker 
 
     docker run --rm -u $(id -u)                             \
         -v $(pwd)/in:/incoming -v $(pwd)/out:/outgoing      \
-        fnndsc/pl-tpdf tpdf --dir "41"                      \
-        /incoming /outgoing
+        jonocameron/pl-tpdf tpdf --dir "41"                      \
+        --imagefile "ex-covid.jpeg" --patientId 12345678 /incoming /outgoing
 
+.. code:: bash
+
+    docker run --rm -u $(id -u)                             \
+        -v $(pwd)/in:/incoming -v $(pwd)/out:/outgoing      \
+        jonocameron/pl-tpdf tpdf                      \
+        --imagefile ex-covid.jpeg /incoming /outgoing
+        
+.. code:: bash
+
+    docker run --rm -u -u $(id -u):$(id -g) \
+        -v $PWD/covidnet-in:/incoming:ro -v $PWD/covidnet-out:/outgoing:rw \
+        fnndsc/pl-covidnet:0.2.0 covidnet \
+        --imagefile chest-scan.jpg /incoming /outgoing
+
+.. code:: bash
+
+    docker run --rm -u -u $(id -u):$(id -g) \
+        -v $PWD/covidnet-out:/incoming:ro -v $PWD/pdfgeneration-out:/outgoing:rw \
+        fnndsc/pl-covidnet-pdfgeneration:0.2.0 pdfgeneration \
+        --imagefile chest-scan.jpg --patientId 12345678 /incoming /outgoing
+
+.. code:: bash
+
+    docker run --rm -v $(pwd)/in:/incoming -v $(pwd)/out:/outgoing \
+        jonocameron/pl-tpdf tpdf --imagefile "ex-covid.jpeg" --patientId "77812345" \
+        /incoming /outgoing
 
 Development
 -----------
